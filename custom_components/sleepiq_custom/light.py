@@ -2,7 +2,7 @@
 import logging
 
 from homeassistant import config_entries
-from homeassistant.components.light import LightEntity
+from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS
 from homeassistant.const import ATTR_ATTRIBUTION
 
 from . import SleepIQDataUpdateCoordinator, SleepIQDevice
@@ -43,11 +43,16 @@ async def async_setup_entry(
 class SleepIQNightLight(LightEntity, SleepIQDevice):
     """ Representation of a light """
 
-    def __init__(self, coordinator: SleepIQDataUpdateCoordinator, outletID: int):
+    def __init__(
+        self,
+        coordinator: SleepIQDataUpdateCoordinator,
+        outletID: int,
+    ):
         super().__init__(coordinator)
         self._coordinator = coordinator
         self._outletid = outletID
         self._name = None
+        self._brightness = self._coordinator.data.foundation.fsLeftUnderbedLightPWM
         self._unique_id = (
             DOMAIN + "_" + self._coordinator.data.bedId + "_light_" + str(outletID)
         )
@@ -76,6 +81,11 @@ class SleepIQNightLight(LightEntity, SleepIQDevice):
         """Return the name of the sensor."""
         return self._name
 
+    # @property
+    # def state(self):
+    #     """Return the name of the sensor."""
+    #     return self._state
+
     @property
     def unique_id(self):
         """Return a unique ID."""
@@ -99,16 +109,31 @@ class SleepIQNightLight(LightEntity, SleepIQDevice):
         """Return True if device is on."""
         return self._is_on
 
+    @property
+    def brightness(self):
+        """Return True if device is on."""
+        return self._brightness
+
+    @property
+    def supported_features(self) -> int:
+        """Flag supported features."""
+        flags = SUPPORT_BRIGHTNESS
+        return flags
+
     async def async_turn_on(self, **kwargs):
         """Turn device on."""
         await self._coordinator.sleepiq.turn_on_light(self._outletid)
+        # self._coordinator.data.light3.setting = 1
         await self._coordinator.async_request_refresh()
         self._is_on = True
+        # self._state = True
 
     async def async_turn_off(self, **kwargs):
         """Turn device off."""
         await self._coordinator.sleepiq.turn_off_light(self._outletid)
+        # self._coordinator.data.light3.setting = 0
         await self._coordinator.async_request_refresh()
+        # self._state = False
         self._is_on = False
 
     # async def async_update(self):

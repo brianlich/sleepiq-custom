@@ -1,6 +1,7 @@
 """The SleepIQ Custom integration."""
 import asyncio
 import logging
+import voluptuous as vol
 from typing import Any, Dict
 
 from sleepi.models import Bed
@@ -16,6 +17,11 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
+SERVICE_SET_SLEEP_NUMBER = "set_sleep_number"
+SERVICE_SET_FAVORITE = "set_favorite_sleep_number"
+SERVICE_SET_FAVORITE_ATTR_SIDE = "side"
+SERVICE_SET_FAVORITE_ATTR_NUMBER = "number"
+
 from .const import (
     DEVICE_MANUFACTURER,
     DEVICE_NAME,
@@ -24,8 +30,16 @@ from .const import (
     SCAN_INTERVAL,
 )
 
+SERVICE_SET_NUMBER_SCHEMA = vol.Schema(
+    {
+        vol.Required(SERVICE_SET_FAVORITE_ATTR_SIDE): str,
+        vol.Required(SERVICE_SET_FAVORITE_ATTR_NUMBER): int,
+    }
+)
+
+
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = ["light", "sensor", "binary_sensor"]
+PLATFORMS = ["light", "sensor", "binary_sensor", "switch"]
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
@@ -49,6 +63,49 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(config_entry, component)
         )
+
+    async def handle_set_sleep_number(call):
+        """ Handle the service call to set the Sleep Number for specific side """
+        side = call.data.get("side", "")
+        number_to_set = call.data.get("sleep_number", "")
+
+        set_sleep_number(side, number_to_set)
+
+    async def handle_set_favorite_sleep_number(call):
+        """ Handle the service call to set the Sleep Number favorite for a specific side """
+        side = call.data.get("side", "")
+        number_to_set = call.data.get("number", "")
+
+        await set_favorite_sleep_number(side, number_to_set)
+
+    async def set_favorite_sleep_number(side, number_to_set):
+        """ Set the favorite sleep number for a specific side"""
+        if side is None:
+            _LOGGER.error("You must specify a side when setting the sleep number")
+        else:
+            _LOGGER.error("This is were we set the favorite sleep number")
+            await coordinator.sleepiq.set_favorite_sleepnumber(side, number_to_set)
+
+    async def set_sleep_number(side, number_to_set):
+        """ Set the sleep number for a specific side"""
+        if side is None:
+            _LOGGER.error("You must specify a side when setting the sleep number")
+
+        if 0 < int(number_to_set) <= 100 and int(number_to_set) % 5 == 0:
+            _LOGGER.error("This is were we set the sleep number")
+            # await coordinator.sleepiq.set_sleepnumber(side, number_to_set)
+        else:
+            message = f"Invalid sleep number: {number_to_set}. The new sleep number must be a multiple of 5 between 5 and 100"
+            _LOGGER.error(message)
+
+    # hass.services.register(DOMAIN, SERVICE_SET_SLEEP_NUMBER, handle_set_sleep_number)
+
+    # hass.services.register(
+    #     DOMAIN,
+    #     SERVICE_SET_FAVORITE,
+    #     handle_set_favorite_sleep_number,
+    #     schema=SERVICE_SET_NUMBER_SCHEMA,
+    # )
 
     return True
 

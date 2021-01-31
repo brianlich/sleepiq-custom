@@ -75,10 +75,66 @@ class IsInBedBinarySensor(SleepIQDevice, BinarySensorEntity):
     @property
     def device_state_attributes(self):
         """Return the state attributes of the device."""
-        return {
-            "bedId": self._coordinator.data.bedId,
-            ATTR_ATTRIBUTION: ATTRIBUTION_TEXT,
-        }
+        if self._side is LEFT:
+            thisdict = {
+                "bedId": self._coordinator.data.left_side.sleeper.bedId,
+                "firstName": self._coordinator.data.left_side.sleeper.firstName,
+                "active": self._coordinator.data.left_side.sleeper.active,
+                "emailValidated": self._coordinator.data.left_side.sleeper.emailValidated,
+                "gender": self._coordinator.data.left_side.sleeper.gender,
+                "isChild": self._coordinator.data.left_side.sleeper.isChild,
+                "birthYear": self._coordinator.data.left_side.sleeper.birthYear,
+                "zipCode": self._coordinator.data.left_side.sleeper.zipCode,
+                "timezone": self._coordinator.data.left_side.sleeper.timezone,
+                "privacyPolicyVersion": self._coordinator.data.left_side.sleeper.privacyPolicyVersion,
+                "duration": self._coordinator.data.left_side.sleeper.duration,
+                "weight": self._coordinator.data.left_side.sleeper.weight,
+                "sleeperId": self._coordinator.data.left_side.sleeper.sleeperId,
+                "firstSessionRecorded": self._coordinator.data.left_side.sleeper.firstSessionRecorded,
+                "height": self._coordinator.data.left_side.sleeper.height,
+                "licenseVersion": self._coordinator.data.left_side.sleeper.licenseVersion,
+                "username": self._coordinator.data.left_side.sleeper.username,
+                "birthMonth": self._coordinator.data.left_side.sleeper.birthMonth,
+                "sleepGoal": self._coordinator.data.left_side.sleeper.sleepGoal,
+                "accountId": self._coordinator.data.left_side.sleeper.accountId,
+                "isAccountOwner": self._coordinator.data.left_side.sleeper.isAccountOwner,
+                "email": self._coordinator.data.left_side.sleeper.email,
+                "lastLogin": self._coordinator.data.left_side.sleeper.lastLogin,
+                "side": self._coordinator.data.left_side.sleeper.side,
+                "favorite": self._coordinator.data.left_side.sleeper.favorite,
+                ATTR_ATTRIBUTION: ATTRIBUTION_TEXT,
+            }
+        else:
+            thisdict = {
+                "bedId": self._coordinator.data.right_side.sleeper.bedId,
+                "firstName": self._coordinator.data.right_side.sleeper.firstName,
+                "active": self._coordinator.data.right_side.sleeper.active,
+                "emailValidated": self._coordinator.data.right_side.sleeper.emailValidated,
+                "gender": self._coordinator.data.right_side.sleeper.gender,
+                "isChild": self._coordinator.data.right_side.sleeper.isChild,
+                "birthYear": self._coordinator.data.right_side.sleeper.birthYear,
+                "zipCode": self._coordinator.data.right_side.sleeper.zipCode,
+                "timezone": self._coordinator.data.right_side.sleeper.timezone,
+                "privacyPolicyVersion": self._coordinator.data.right_side.sleeper.privacyPolicyVersion,
+                "duration": self._coordinator.data.right_side.sleeper.duration,
+                "weight": self._coordinator.data.right_side.sleeper.weight,
+                "sleeperId": self._coordinator.data.right_side.sleeper.sleeperId,
+                "firstSessionRecorded": self._coordinator.data.right_side.sleeper.firstSessionRecorded,
+                "height": self._coordinator.data.right_side.sleeper.height,
+                "licenseVersion": self._coordinator.data.right_side.sleeper.licenseVersion,
+                "username": self._coordinator.data.right_side.sleeper.username,
+                "birthMonth": self._coordinator.data.right_side.sleeper.birthMonth,
+                "sleepGoal": self._coordinator.data.right_side.sleeper.sleepGoal,
+                "accountId": self._coordinator.data.right_side.sleeper.accountId,
+                "isAccountOwner": self._coordinator.data.right_side.sleeper.isAccountOwner,
+                "email": self._coordinator.data.right_side.sleeper.email,
+                "lastLogin": self._coordinator.data.right_side.sleeper.lastLogin,
+                "side": self._coordinator.data.right_side.sleeper.side,
+                "favorite": self._coordinator.data.right_side.sleeper.favorite,
+                ATTR_ATTRIBUTION: ATTRIBUTION_TEXT,
+            }
+
+        return thisdict
 
 
 class SleepNumberConnectivityBinarySensor(SleepIQDevice, BinarySensorEntity):
